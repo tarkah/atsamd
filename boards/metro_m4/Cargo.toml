@@ -39,6 +39,7 @@ version = "~0.3"
 default = ["rt", "atsamd-hal/samd51j19a", "atsamd-hal/samd51"]
 rt = ["cortex-m-rt", "atsamd-hal/samd51j19a-rt"]
 unproven = ["atsamd-hal/unproven"]
+usb = ["atsamd-hal/usb"]
 
 [profile.dev]
 incremental = false

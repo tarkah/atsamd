@@ -23,7 +23,7 @@ use hal::time::Hertz;
 #[cfg(feature = "usb")]
 pub use hal::usb::UsbBus;
 #[cfg(feature = "usb")]
-use usb_device::bus::UsbBusWrapper;
+use hal::usb::usb_device::bus::UsbBusAllocator;
 
 define_pins!(
     /// Maps the pins to their arduino names and
@@ -188,4 +188,26 @@ pub fn uart<F: Into<Hertz>>(
         mclk,
         (d0.into_pad(port), d1.into_pad(port)),
     )
+}
+
+#[cfg(feature = "usb")]
+pub fn usb_allocator(
+    usb: pac::USB,
+    clocks: &mut GenericClockController,
+    mclk: &mut pac::MCLK,
+    dm: gpio::Pa24<Input<Floating>>,
+    dp: gpio::Pa25<Input<Floating>>,
+    port: &mut Port,
+) -> UsbBusAllocator<UsbBus> {
+    let gclk0 = clocks.gclk0();
+    dbgprint!("making usb clock");
+    let usb_clock = &clocks.usb(&gclk0).unwrap();
+    dbgprint!("got clock");
+    UsbBusAllocator::new(UsbBus::new(
+        usb_clock,
+        mclk,
+        dm.into_function_h(port),
+        dp.into_function_h(port),
+        usb,
+    ))
 }
